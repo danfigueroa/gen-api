@@ -1,21 +1,13 @@
-import { Schema, model, Document } from 'mongoose';
+import { Schema, model, Document, Types } from 'mongoose';
+import { ICategory, ICategoryDocument } from '../interfaces/category.interface';
 
-interface ICategory extends Document {
-  name: string;
-  percentage: number;
-}
-
-const CategorySchema = new Schema<ICategory>({
-  name: {
-    type: String,
-    required: true,
+const CategorySchema = new Schema<ICategoryDocument>(
+  {
+    name: { type: String, required: true },
   },
-  percentage: {
-    type: Number,
-    required: true,
-  },
-});
+  { timestamps: true }
+);
 
-const CategoryModel = model<ICategory>('Category', CategorySchema);
+const CategoryModel = model<ICategoryDocument>('Category', CategorySchema);
 
 export default CategoryModel;
