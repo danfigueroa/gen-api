@@ -1,27 +1,17 @@
-import mongoose, { MongooseOptions } from 'mongoose'
+import { MongoClient } from 'mongodb';
 
-class DatabaseConnection {
-  private connectionOptions: MongooseOptions;
+const mongoURL = 'mongodb://localhost:27017/genDb';
 
-  constructor() {
-    this.connectionOptions = {
-      // TODO: Add connection options
-    };
+async function connectToDatabase() {
+  try {
+    const client = await MongoClient.connect(mongoURL);
+    const db = client.db(); 
+    console.log('Connected to MongoDB');
+    return db;
+  } catch (error) {
+    console.error('Failed to connect to MongoDB:', error);
+    throw error;
   }
+};
 
-  public async connect(databaseURL: string): Promise<void> {
-    try {
-      await mongoose.connect(databaseURL, this.connectionOptions);
-      console.log('Connected to the database successfully!');
-    } catch (error) {
-      console.error('Error connecting to the database:', error);
-      throw error;
-    }
-  }
-
-  public disconnect(): Promise<void> {
-    return mongoose.disconnect();
-  }
-}
-
-export default DatabaseConnection;
+export default connectToDatabase;
