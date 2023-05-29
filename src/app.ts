@@ -3,6 +3,7 @@ import express from 'express';
 import connectToDatabase from './database/connection';
 import container from './config/container';
 import { IProductService, IProductDocument } from './interfaces/product.interface';
+import { ICategoryDocument, ICategoryService  } from './interfaces/category.interface';
 
 const app = express();
 const port = 3000;
@@ -20,6 +21,7 @@ connectToDatabase()
   });
 
 const productService = container.resolve<IProductService>('ProductService');
+const categoryService = container.resolve<ICategoryService>('CategoryService');
 
 app.post('/products', async (req, res) => {
   try {
@@ -68,6 +70,56 @@ app.delete('/products/:productId', async (req, res) => {
     res.sendStatus(204);
   } catch (error) {
     res.status(500).json({ error: 'Failed to delete product' });
+  }
+});
+
+app.post('/categories', async (req, res) => {
+  try {
+    const categoryData: ICategoryDocument = req.body;
+    const createdCategory = await categoryService.createCategory(categoryData);
+
+    res.status(201).json(createdCategory);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to create category' });
+  }
+});
+
+app.get('/categories/:categoryId', async (req, res) => {
+  try {
+    const categoryId = req.params.categoryId;
+    const category = await categoryService.getCategory(categoryId);
+    if (category) {
+      res.json(category);
+    } else {
+      res.status(404).json({ error: 'Category not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get category' });
+  }
+});
+
+app.put('/categories/:categoryId', async (req, res) => {
+  try {
+    const categoryId = req.params.categoryId;
+    const categoryData: Partial<ICategoryDocument> = req.body;
+    const updatedCategory = await categoryService.updateCategory(categoryId, categoryData as ICategoryDocument);
+    if (updatedCategory) {
+      res.json(updatedCategory);
+    } else {
+      res.status(404).json({ error: 'Category not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update category' });
+  }
+});
+
+app.delete('/categories/:categoryId', async (req, res) => {
+  try {
+    const categoryId = req.params.categoryId;
+    await categoryService.deleteCategory(categoryId);
+    res.sendStatus(204);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to delete category' });
   }
 });
 
